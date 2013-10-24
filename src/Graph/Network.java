@@ -55,7 +55,7 @@ public class Network {
 
 		while (!queue.isEmpty()) {
 			// update queue ordering
-			for (int i = 0; i < graph.size(); i++) {
+			for (int i = 0; i < queue.size(); i++) {
 				queue.add(queue.poll());
 			}
 
@@ -109,7 +109,7 @@ public class Network {
 
 		while (!queue.isEmpty()) {
 			// update queue ordering
-			for (int i = 0; i < graph.size(); i++) {
+			for (int i = 0; i < queue.size(); i++) {
 				queue.add(queue.poll());
 			}
 
@@ -161,16 +161,26 @@ public class Network {
 
 		// start with node one
 		Node u = node;
+		Node lastU = null;
+		int aux = 0;
 		Node v;
-		double biggestDist = 0;
+		double conn, cap, dist;
 
 		while (!queue.isEmpty()) {
-			// update queue ordering
-			for (int i = 0; i < graph.size(); i++) {
-				queue.add(queue.poll());
+			//avoiding infinite loops
+			if (u.equals(lastU)){
+				aux++;
+				if (aux > 1)
+					break;
 			}
-
+			
+			// update queue ordering
+			for (int i = 0; i < queue.size(); i++) {
+				queue.add(queue.poll());
+			}	
+			
 			// finding the node with smallest distance from u
+			lastU = u;
 			u = queue.poll();
 
 			// update distance value of all adjacent nodes
@@ -179,9 +189,9 @@ public class Network {
 				v = u.getLinks().get(i).getNextNode(u.getName());
 				
 				//relaxation of the distances
-				double conn = u.getLinks().get(i).getCurrentConnections();
-				double cap = u.getLinks().get(i).getCapacity();
-				double dist = conn/cap;
+				conn = u.getLinks().get(i).getCurrentConnections();
+				cap = u.getLinks().get(i).getCapacity();
+				dist = conn/cap;
 				if (v.getDist() > dist) {					
 					v.setRoutedParent(u.getIndex());
 					if (u.getDist() > dist)
@@ -189,22 +199,11 @@ public class Network {
 					else
 						v.setDist(dist);
 					
-					if (!queue.contains(v)) {
+					if (!queue.contains(v))
 						queue.add(v);
-					}
-				}
-
-				// relaxation of the distances
-				/*if (v.getDist() > u.getDist() + u.getLinks().get(i).getCurrentConnections()/u.getLinks().get(i).getCapacity()) {
 					
-					v.setDist(u.getDist() + u.getLinks().get(i).getCurrentConnections()/u.getLinks().get(i).getCapacity());
-					v.setRoutedParent(u.getIndex());
-					
-					if (!queue.contains(v)) {
-						queue.add(v);
-					}
-				}*/
-			}
+				}				
+			}				
 		}
 	}
 
@@ -242,6 +241,7 @@ public class Network {
 		float reqTime, reqDuration;
 		String[] splitedSegments;
 
+		boolean aux = true;
 		while (line != null) {
 			splitedSegments = line.split(" ");
 			node1 = splitedSegments[1].charAt(0);
@@ -275,8 +275,9 @@ public class Network {
 				if (!nodeOne.getLink(nodeTwo.getName()).isBusy()) {
 					nodeOne.getLink(nodeTwo.getName()).addConnection();
 					path.addLink(nodeOne.getLink(nodeTwo.getName()));
-					System.out.println("added a connection between "
+					System.out.println("\n\radded a connection between "
 							+ nodeOne.getName() + " and " + nodeTwo.getName());
+					System.out.println("number of connections in link "+nodeOne.getName()+"-"+nodeTwo.getName()+": "+nodeOne.getLink(nodeTwo.getName()).getCurrentConnections()+"/"+nodeOne.getLink(nodeTwo.getName()).getCapacity());
 
 					// update nodeTwo and nodeOne along the routed path
 					nodeTwo = nodeOne;

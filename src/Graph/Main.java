@@ -12,21 +12,17 @@ public class Main {
 		try {
 			// Creation of the topology
 			createTopology(nodes);
-			//System.out.println(nodes.toString());
-			
-			//Set the network
+			// System.out.println(nodes.toString());
+
+			// Set the network
 			Network network = new Network(nodes, "workload.txt");
-			ArrayList<Path> allPaths = network.createWorkload();			
+			ArrayList<Path> allPaths = network.createWorkload();
 			System.out.println(allPaths.toString());
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		
-		
-		System.out.println();
 
 	}
 
@@ -43,7 +39,7 @@ public class Main {
 		Node nodeOne = null, nodeTwo = null;
 		String[] splitedSegments;
 
-		//go through every line of the input file
+		// go through every line of the input file
 		while (line != null) {
 			splitedSegments = line.split(" ");
 			node1 = splitedSegments[0].charAt(0);
@@ -53,30 +49,30 @@ public class Main {
 
 			nodeOne = new Node(node1);
 			nodeTwo = new Node(node2);
-			
-			//verifying if nodes have already been stored
+
+			// verifying if nodes have already been stored
 			boolean one = false;
 			boolean two = false;
-			for (int i = 0; i < nodes.size(); i++){
-				if (nodes.get(i).getName() == node1){
+			for (int i = 0; i < nodes.size(); i++) {
+				if (nodes.get(i).getName() == node1) {
 					nodeOne = nodes.get(i);
 					one = true;
 				}
-				if (nodes.get(i).getName() == node2){
+				if (nodes.get(i).getName() == node2) {
 					nodeTwo = nodes.get(i);
 					two = true;
 				}
 			}
-			
-			//store nodes if they have not already been stored
-			if (!one){
+
+			// store nodes if they have not already been stored
+			if (!one) {
 				nodeOne.setIndex(nodes.size());
 				nodes.add(nodeOne);
 			}
-			if (!two){
+			if (!two) {
 				nodeTwo.setIndex(nodes.size());
 				nodes.add(nodeTwo);
-			}				
+			}
 
 			// Creating the link between the nodes
 			link = new Link(propagation, capacity, nodeOne, nodeTwo);
@@ -84,14 +80,12 @@ public class Main {
 			// Adding the link to the nodes
 			nodeOne.addLink(link);
 			nodeTwo.addLink(link);
-			
+
 			line = br.readLine();
 		}
 
 		br.close();
 
 	}
-
-	
 
 }

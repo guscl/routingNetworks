@@ -21,8 +21,7 @@ public class Network {
 		this.workloadPath = workloadPath;
 	}
 
-	private ArrayList<Node> sdp(char node1, char node2) {
-		ArrayList<Node> path = new ArrayList<Node>();
+	private void sdp(char node1, char node2) {
 		Node node = null;
 
 		// Finding the starting node inside the array
@@ -58,7 +57,6 @@ public class Network {
 
 			// finding the node with smallest distance from u
 			u = queue.poll();
-			path.add(u);
 
 			// update distance value of all adjacent nodes
 			for (int i = 0; i < u.getLinks().size(); i++) {
@@ -78,7 +76,6 @@ public class Network {
 				}
 			}
 		}
-		return path;
 
 	}
 
@@ -143,8 +140,7 @@ public class Network {
 			while (true) {
 				// add one connection between nodeOne and nodeTwo
 				if (!nodeOne.getLink(nodeTwo.getName()).isBusy()) {
-					nodeOne.getLink(nodeTwo.getName()).addConnection();
-					
+
 					path.addLink(nodeOne.getLink(nodeTwo.getName()));
 					System.out.println("added a connection between "
 							+ nodeOne.getName() + " and " + nodeTwo.getName());
@@ -157,13 +153,16 @@ public class Network {
 					if (nodeTwo.getName() == node1)
 						break;
 				} else {
-					return null;
+					//Set this path to null so it doesn't count as success
+					path = new Path();
+					break;
 				}
 			}
-			//Will use this path to program the time stuff..
+			// Will use this path to program the time stuff..
+			//nodeOne.getLink(nodeTwo.getName()).addConnection();
 			allPaths.add(path);
 			line = br.readLine();
-			System.out.println();
+
 		}
 
 		br.close();

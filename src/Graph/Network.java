@@ -21,6 +21,62 @@ public class Network {
 		this.workloadPath = workloadPath;
 	}
 
+	private void shp(char node1, char node2) {
+		Node node = null;
+
+		// Finding the starting node inside the array
+		for (int i = 0; i < graph.size(); i++) {
+			if (graph.get(i).getName() == node1)
+				node = graph.get(i);
+		}
+
+		// initialize queues
+		PriorityQueue<Node> queue = new PriorityQueue<Node>(graph.size(),
+				new NodeComparator());
+		for (int i = 0; i < graph.size(); i++) {
+			queue.add(graph.get(i));
+		}
+
+		// initializing all distances with infinity
+		for (int i = 0; i < graph.size(); i++) {
+			graph.get(i).setDist(9999999);
+			graph.get(i).setVisited(false);
+		}
+		// node one has distance 0
+		node.setDist(0);
+
+		// start with node one
+		Node u = node;
+		Node v;
+
+		while (!queue.isEmpty()) {
+			// update queue ordering
+			for (int i = 0; i < graph.size(); i++) {
+				queue.add(queue.poll());
+			}
+
+			// finding the node with smallest distance from u
+			u = queue.poll();
+
+			// update distance value of all adjacent nodes
+			for (int i = 0; i < u.getLinks().size(); i++) {
+				// get adjacent node
+				v = u.getLinks().get(i).getNextNode(u.getName());
+
+				// relaxation of the distances
+				if (v.getDist() > u.getDist() + 1) {
+					v.setDist(u.getDist() + 1);
+					v.setRoutedParent(u.getIndex());
+					if (!queue.contains(v)) {
+						queue.add(v);
+					}
+
+				}
+			}
+		}
+
+	}
+
 	private void sdp(char node1, char node2) {
 		Node node = null;
 
@@ -99,7 +155,8 @@ public class Network {
 		return totalDelay;
 	}
 
-	public ArrayList<Path> createWorkload() throws IOException {
+	public ArrayList<Path> createWorkload(String routingForm)
+			throws IOException {
 		// Creating the graph workload
 		BufferedReader br = new BufferedReader(new FileReader(
 				"simpleWorkload.txt"));
@@ -119,9 +176,13 @@ public class Network {
 			reqTime = Float.valueOf(splitedSegments[0]);
 			reqDuration = Float.valueOf(splitedSegments[3]);
 
-			// Determining routing path with SDP
-			sdp(node1, node2);
-
+			if (routingForm.equals("SHP"))
+				shp(node1, node2);
+			else if (routingForm.equals("SDP"))
+				sdp(node1, node2);
+			else// llp
+				;
+			
 			Node nodeTwo = null;
 			Node nodeOne = null;
 
@@ -140,7 +201,7 @@ public class Network {
 			while (true) {
 				// add one connection between nodeOne and nodeTwo
 				if (!nodeOne.getLink(nodeTwo.getName()).isBusy()) {
-
+					nodeOne.getLink(nodeTwo.getName()).addConnection();
 					path.addLink(nodeOne.getLink(nodeTwo.getName()));
 					System.out.println("added a connection between "
 							+ nodeOne.getName() + " and " + nodeTwo.getName());
@@ -153,13 +214,13 @@ public class Network {
 					if (nodeTwo.getName() == node1)
 						break;
 				} else {
-					//Set this path to null so it doesn't count as success
+					// Set this path to null so it doesn't count as success
 					path = new Path();
 					break;
 				}
 			}
 			// Will use this path to program the time stuff..
-			//nodeOne.getLink(nodeTwo.getName()).addConnection();
+			
 			allPaths.add(path);
 			line = br.readLine();
 
@@ -168,5 +229,4 @@ public class Network {
 		br.close();
 		return allPaths;
 	}
-
 }

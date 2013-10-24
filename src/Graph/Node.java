@@ -3,51 +3,43 @@ package Graph;
 import java.util.ArrayList;
 
 public class Node {
-	
-	private char name;	
+
+	private char name;
 	private ArrayList<Link> links;
 	private boolean visited;
-	private int hop = 0;
+
 	private int myIndex;
 	private int myDist;
 	private int myRoutedParent;
-	
-	public Node(char name){
+
+	public Node(char name) {
 		visited = false;
 		links = new ArrayList<Link>();
 		this.setName(name);
 	}
-	
-	public void setRoutedParent(int i){
+
+	public void setRoutedParent(int i) {
 		myRoutedParent = i;
 	}
-	
-	public int getRoutedParent(){
+
+	public int getRoutedParent() {
 		return myRoutedParent;
 	}
-	
-	public void setDist(int i){
+
+	public void setDist(int i) {
 		myDist = i;
 	}
-	
-	public int getDist(){
+
+	public int getDist() {
 		return myDist;
 	}
-	
-	public void setIndex(int i){
+
+	public void setIndex(int i) {
 		myIndex = i;
 	}
-	
-	public int getIndex(){
-		return myIndex;
-	}
-	
-	public int getHop() {
-		return hop;
-	}
 
-	public void setHop(int hop) {
-		this.hop = hop;
+	public int getIndex() {
+		return myIndex;
 	}
 
 	public void setLinks(ArrayList<Link> links) {
@@ -61,11 +53,11 @@ public class Node {
 	public void setVisited(boolean visited) {
 		this.visited = visited;
 	}
-	
-	public void addLink(Link link){
+
+	public void addLink(Link link) {
 		links.add(link);
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Node [name=" + name + ", links=" + links + "]" + "\n";
@@ -78,24 +70,24 @@ public class Node {
 	public char getName() {
 		return name;
 	}
+
 	public void setName(char name) {
 		this.name = name;
 	}
-	
-	public Link getLink(char nextNode){
-		for (int i = 0; i < this.links.size(); i++){
+
+	public Link getLink(char nextNode) {
+		for (int i = 0; i < this.links.size(); i++) {
 			if (this.links.get(i).getNextNode(this.name).getName() == nextNode)
-				return this.links.get(i);			
+				return this.links.get(i);
 		}
 		return null;
 	}
-	
-	public Node getNextNode(){
+
+	public Node getNextNode() {
 		Node nearest = links.get(0).getNextNode(name);
-		
+
 		return nearest;
-			
+
 	}
-		
 
 }

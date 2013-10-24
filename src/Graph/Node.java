@@ -9,7 +9,7 @@ public class Node {
 	private boolean visited;
 
 	private int myIndex;
-	private int myDist;
+	private double myDist;
 	private int myRoutedParent;
 
 	public Node(char name) {
@@ -26,11 +26,11 @@ public class Node {
 		return myRoutedParent;
 	}
 
-	public void setDist(int i) {
+	public void setDist(double i) {
 		myDist = i;
 	}
 
-	public int getDist() {
+	public double getDist() {
 		return myDist;
 	}
 

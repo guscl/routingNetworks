@@ -16,7 +16,7 @@ public class Main {
 
 			// Set the network
 			Network network = new Network(nodes, "workload.txt");
-			ArrayList<Path> allPaths = network.createWorkload("SDP");
+			ArrayList<Path> allPaths = network.createWorkload(Network.LLP);
 			System.out.println(allPaths.toString());
 
 		} catch (IOException e) {

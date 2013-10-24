@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.PriorityQueue;
 
 public class Network {
+	public static final int SHP = 1;
+	public static final int SDP = 2;
+	public static final int LLP = 3;
+	
 	private ArrayList<Node> graph = null;
 	private String workloadPath = null;
 
@@ -21,7 +25,7 @@ public class Network {
 		this.workloadPath = workloadPath;
 	}
 
-	private void shp(char node1, char node2) {
+	private void shp(char node1) {
 		Node node = null;
 
 		// Finding the starting node inside the array
@@ -70,14 +74,12 @@ public class Network {
 					if (!queue.contains(v)) {
 						queue.add(v);
 					}
-
 				}
 			}
 		}
-
 	}
 
-	private void sdp(char node1, char node2) {
+	private void sdp(char node1) {
 		Node node = null;
 
 		// Finding the starting node inside the array
@@ -128,11 +130,82 @@ public class Network {
 					if (!queue.contains(v)) {
 						queue.add(v);
 					}
-
 				}
 			}
 		}
+	}
+	
+	private void llp(char node1) {
+		Node node = null;
 
+		// Finding the starting node inside the array
+		for (int i = 0; i < graph.size(); i++) {
+			if (graph.get(i).getName() == node1)
+				node = graph.get(i);
+		}
+
+		// initialize queues
+		PriorityQueue<Node> queue = new PriorityQueue<Node>(graph.size(),
+				new NodeComparator());
+		for (int i = 0; i < graph.size(); i++) {
+			queue.add(graph.get(i));
+		}
+
+		// initializing all distances with infinity
+		for (int i = 0; i < graph.size(); i++) {
+			graph.get(i).setDist(9999999);
+			graph.get(i).setVisited(false);
+		}
+		// node one has distance 0
+		node.setDist(0);
+
+		// start with node one
+		Node u = node;
+		Node v;
+		double biggestDist = 0;
+
+		while (!queue.isEmpty()) {
+			// update queue ordering
+			for (int i = 0; i < graph.size(); i++) {
+				queue.add(queue.poll());
+			}
+
+			// finding the node with smallest distance from u
+			u = queue.poll();
+
+			// update distance value of all adjacent nodes
+			for (int i = 0; i < u.getLinks().size(); i++) {
+				// get adjacent node
+				v = u.getLinks().get(i).getNextNode(u.getName());
+				
+				//relaxation of the distances
+				double conn = u.getLinks().get(i).getCurrentConnections();
+				double cap = u.getLinks().get(i).getCapacity();
+				double dist = conn/cap;
+				if (v.getDist() > dist) {					
+					v.setRoutedParent(u.getIndex());
+					if (u.getDist() > dist)
+						v.setDist(u.getDist());
+					else
+						v.setDist(dist);
+					
+					if (!queue.contains(v)) {
+						queue.add(v);
+					}
+				}
+
+				// relaxation of the distances
+				/*if (v.getDist() > u.getDist() + u.getLinks().get(i).getCurrentConnections()/u.getLinks().get(i).getCapacity()) {
+					
+					v.setDist(u.getDist() + u.getLinks().get(i).getCurrentConnections()/u.getLinks().get(i).getCapacity());
+					v.setRoutedParent(u.getIndex());
+					
+					if (!queue.contains(v)) {
+						queue.add(v);
+					}
+				}*/
+			}
+		}
 	}
 
 	public int getCircuitRequests() {
@@ -155,7 +228,7 @@ public class Network {
 		return totalDelay;
 	}
 
-	public ArrayList<Path> createWorkload(String routingForm)
+	public ArrayList<Path> createWorkload(int routingForm)
 			throws IOException {
 		// Creating the graph workload
 		BufferedReader br = new BufferedReader(new FileReader(
@@ -176,12 +249,12 @@ public class Network {
 			reqTime = Float.valueOf(splitedSegments[0]);
 			reqDuration = Float.valueOf(splitedSegments[3]);
 
-			if (routingForm.equals("SHP"))
-				shp(node1, node2);
-			else if (routingForm.equals("SDP"))
-				sdp(node1, node2);
-			else// llp
-				;
+			if (routingForm == Network.SHP)
+				shp(node1);
+			else if (routingForm == Network.SDP)
+				sdp(node1);
+			else if (routingForm == Network.LLP)
+				llp(node1);
 			
 			Node nodeTwo = null;
 			Node nodeOne = null;
@@ -196,7 +269,6 @@ public class Network {
 
 			System.out.println("new path");
 			// Creating the connections from the path
-			int i = 0;
 			Path path = new Path();
 			while (true) {
 				// add one connection between nodeOne and nodeTwo
@@ -219,11 +291,9 @@ public class Network {
 					break;
 				}
 			}
-			// Will use this path to program the time stuff..
-			
+			// Will use this path to program the time stuff..			
 			allPaths.add(path);
 			line = br.readLine();
-
 		}
 
 		br.close();

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Timer;
 
 public class Main {
 
@@ -16,8 +17,7 @@ public class Main {
 
 			// Set the network
 			Network network = new Network(nodes, "workload.txt");
-			ArrayList<Path> allPaths = network.createWorkload(Network.LLP);
-			System.out.println(allPaths.toString());
+			network.createWorkload(Network.LLP);
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

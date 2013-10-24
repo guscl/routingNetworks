@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.PriorityQueue;
+import java.util.Timer;
 
 public class Network {
 	public static final int SHP = 1;
@@ -13,6 +15,8 @@ public class Network {
 	
 	private ArrayList<Node> graph = null;
 	private String workloadPath = null;
+	
+	private Timer scheduler = new Timer();
 
 	private int circuitRequests = 0;
 	private int successfulRequests = 0;
@@ -227,7 +231,7 @@ public class Network {
 		return totalDelay;
 	}
 
-	public ArrayList<Path> createWorkload(int routingForm)
+	public void createWorkload(int routingForm)
 			throws IOException {
 		// Creating the graph workload
 		BufferedReader br = new BufferedReader(new FileReader(
@@ -236,7 +240,6 @@ public class Network {
 		String line = br.readLine();
 
 		// Creating buffer variables
-		ArrayList<Path> allPaths = new ArrayList<Path>();
 		char node1, node2;
 		float reqTime, reqDuration;
 		String[] splitedSegments;
@@ -269,12 +272,12 @@ public class Network {
 
 			System.out.println("new path");
 			// Creating the connections from the path
-			Path path = new Path();
+			ArrayList<Link> path = new ArrayList<Link>();
 			while (true) {
 				// add one connection between nodeOne and nodeTwo
 				if (!nodeOne.getLink(nodeTwo.getName()).isBusy()) {
 					nodeOne.getLink(nodeTwo.getName()).addConnection();
-					path.addLink(nodeOne.getLink(nodeTwo.getName()));
+					path.add(nodeOne.getLink(nodeTwo.getName()));
 					System.out.println("\n\radded a connection between "
 							+ nodeOne.getName() + " and " + nodeTwo.getName());
 					System.out.println("number of connections in link "+nodeOne.getName()+"-"+nodeTwo.getName()+": "+nodeOne.getLink(nodeTwo.getName()).getCurrentConnections()+"/"+nodeOne.getLink(nodeTwo.getName()).getCapacity());
@@ -285,19 +288,26 @@ public class Network {
 
 					// stop when reach first node of the connection
 					if (nodeTwo.getName() == node1)
+						successfulRequests++;
 						break;
 				} else {
 					// Set this path to null so it doesn't count as success
-					path = new Path();
+					path = new ArrayList<Link>();
 					break;
 				}
 			}
 			// Will use this path to program the time stuff..			
-			allPaths.add(path);
+			for(int i = 0; i< path.size();i++){
+				Calendar date = Calendar.getInstance();
+				//date.se
+				//scheduler.schedule(new ConnectionTask(path.get(i)), reqDuration);
+			}
+			
+			
 			line = br.readLine();
 		}
 
 		br.close();
-		return allPaths;
+		
 	}
 }
